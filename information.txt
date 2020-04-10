@@ -1,0 +1,19 @@
+>>to create database from  terminal
+
+---mysql -uroot
+---create databse dblaravue;
+
+>>to add  an column to existing table
+---php artisan make:migration add_user_id_column_users --table=users
+
+>>to add data in tables from terminal 
+---php artisan tinker
+--$role = new  App\Role
+--$role->name='Admin'
+--$role->save() 
+
+>>to create model and  controller
+
+php artisan make:model Role -mc
+or if you want make resource controller then 
+php artisan make:model Role -mcr
