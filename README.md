@@ -12,8 +12,8 @@ database file( laravue_db ) is added to project you can login with the given use
 
 or
 
-you can migrate tables to new database . for that you have to congfigure the .env file and change set the new database name.
-and then follow this command
+you can migrate tables to new database . for that you have to congfigure the .env file and set the new database name.
+and then follow this command to add tables to new database
 
     php artisan migrate
 
@@ -33,6 +33,10 @@ so we can add directly add a new role to the role table or we can use tinker to 
     => true
     >>>
     
+--You can change port in the file name webpack.mix.js
+       
+    mix.browserSync({proxy: "laravue.test", port: yourport});
+
 now to run the project type this command
 
     npm run watch
