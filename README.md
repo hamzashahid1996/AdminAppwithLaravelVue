@@ -5,7 +5,10 @@ run this command
 
     npm install or npm i
 
-database file( laravue_db ) is added to project
+database file( laravue_db ) is added to project you can login with the given user:
+        
+        Username: admin@admin.com
+        Password: Admin@123
 
 or
 
