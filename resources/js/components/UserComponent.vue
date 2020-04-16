@@ -289,7 +289,7 @@ export default {
         }
       },
       search_it(e){
-          if(e.length >= 3){
+          if(e.length > 3){
               axios.get(`/api/users/${e}`)
               .then(res => {this.users = res.data.users})
               .catch(err => console.dir(err.response))

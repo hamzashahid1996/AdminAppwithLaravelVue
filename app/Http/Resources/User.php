@@ -21,7 +21,7 @@ class User extends JsonResource
             'email'  =>$this->email,
             'role'=>$this->role->name,
             'phone_no'=>$this->phone_no,
-            'photo'=> asset( $this->profile->photo),
+            'photo' => asset('/storage/images/'.$this->profile->photo),
             'created_at'=>$this->created_at->format('d-m-Y H:i:s'),
             'updated_at'=>$this->updated_at->format('d-m-Y H:i:s'),
         ];

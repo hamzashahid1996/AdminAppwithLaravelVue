@@ -2332,34 +2332,65 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       dialog: false,
       loading: false,
       snackbar: false,
-      snackbarText: '',
       selected: [],
+      text: '',
+      options: {
+        itemsPerPage: 5,
+        sortBy: ['id'],
+        sortDesc: [false]
+      },
       headers: [{
-        text: "#",
-        align: "start",
+        text: '#',
+        align: 'left',
         sortable: false,
-        value: "id"
+        value: 'id'
       }, {
-        text: "Name",
-        value: "name"
+        text: 'Name',
+        value: 'name'
       }, {
-        text: "Created At",
-        value: "created_at",
-        sortable: false
+        text: 'Created At',
+        value: 'created_at'
       }, {
-        text: "Updated At",
-        value: "updated_at",
-        sortable: false
+        text: 'Updated At',
+        value: 'updated_at'
       }, {
-        text: "Actions",
-        value: "actions",
-        sortable: false
+        text: 'Actions',
+        value: 'action'
       }],
       roles: [],
       editedIndex: -1,
@@ -2379,12 +2410,36 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     formTitle: function formTitle() {
-      return this.editedIndex === -1 ? "New Role" : "Edit Role";
+      return this.editedIndex === -1 ? 'New Role' : 'Edit Role';
     }
   },
   watch: {
     dialog: function dialog(val) {
       val || this.close();
+    },
+    options: {
+      handler: function handler(e) {
+        var _this = this;
+
+        console.dir(e);
+        var sortBy = e.sortBy.length > 0 ? e.sortBy[0].trim() : 'id';
+        var orderBy = e.sortDesc[0] ? 'desc' : 'asc';
+        axios.get("/api/roles", {
+          params: {
+            'page': e.page,
+            'per_page': e.itemsPerPage,
+            'sort_by': sortBy,
+            'order_by': orderBy
+          }
+        }).then(function (res) {
+          _this.roles = res.data.roles;
+        })["catch"](function (err) {
+          if (err.response.status == 401) localStorage.removeItem('token');
+
+          _this.$router.push('/login');
+        });
+      },
+      deep: true
     }
   },
   created: function created() {
@@ -2398,94 +2453,89 @@ __webpack_require__.r(__webpack_exports__);
         this.selected = e.map(function (val) {
           return val.id;
         });
-      } //console.dir(this.selected);
-
+      }
     },
     deleteAll: function deleteAll() {
-      var _this = this;
+      var _this2 = this;
 
-      var decide = confirm("Are you sure you want to delete these Roles?");
+      var decide = confirm('Are you sure you want to delete these items?');
 
       if (decide) {
         axios.post('/api/roles/delete', {
           'roles': this.selected
         }).then(function (res) {
-          _this.snackbarText = "Record Delete Successfully!";
+          _this2.text = "Records Deleted Successfully!";
 
-          _this.selected.map(function (val) {
-            var index = _this.roles.data.indexOf(val);
+          _this2.selected.map(function (val) {
+            var index = _this2.roles.data.indexOf(val);
 
-            _this.roles.data.splice(index, 1);
+            _this2.roles.data.splice(index, 1);
           });
 
-          _this.snackbar = true;
+          _this2.snackbar = true;
         })["catch"](function (err) {
           console.log(err.response);
-          _this.snackbarText = "Error Deleting Record!";
-          _this.snackbar = true;
+          _this2.text = "Error Deleting Record";
+          _this2.snackbar = true;
         });
       }
     },
-    search_it: function search_it(e) {
-      var _this2 = this;
+    searchIt: function searchIt(e) {
+      var _this3 = this;
 
-      if (e.length >= 3) {
+      if (e.length > 3) {
         axios.get("/api/roles/".concat(e)).then(function (res) {
-          return _this2.roles = res.data.roles;
+          return _this3.roles = res.data.roles;
         })["catch"](function (err) {
           return console.dir(err.response);
         });
       }
 
       if (e.length <= 0) {
-        axios.get('/api/roles').then(function (res) {
-          return _this2.roles = res.data.roles;
+        axios.get("/api/roles").then(function (res) {
+          return _this3.roles = res.data.roles;
         })["catch"](function (err) {
           return console.dir(err.response);
         });
       }
     },
     paginate: function paginate(e) {
-      var _this3 = this;
+      var _this4 = this;
 
-      //console.dir(e)
-      axios.get("/api/roles?page=".concat(e.page), {
+      var sortBy = e.sortBy.length > 0 ? e.sortBy[0].trim() : 'name';
+      var orderBy = e.sortDesc[0] ? 'desc' : 'asc';
+      axios.get("/api/roles", {
         params: {
-          'per_page': e.itemsPerPage
+          'page': e.page,
+          'per_page': e.itemsPerPage,
+          'sort_by': sortBy,
+          'order_by': orderBy
         }
       }).then(function (res) {
-        return _this3.roles = res.data.roles;
+        _this4.roles = res.data.roles;
       })["catch"](function (err) {
-        if (err.response.status == 401) {
-          localStorage.removeItem('token');
+        if (err.response.status == 401) localStorage.removeItem('token');
 
-          _this3.$router.push('/login');
-        }
+        _this4.$router.push('/login');
       });
     },
     initialize: function initialize() {
-      var _this4 = this;
+      var _this5 = this;
 
       // Add a request interceptor
       axios.interceptors.request.use(function (config) {
-        // Do something before request is sent
-        _this4.loading = true;
+        _this5.loading = true;
         return config;
       }, function (error) {
-        // Do something with request error
-        _this4.loading = false;
+        _this5.loading = false;
         return Promise.reject(error);
       }); // Add a response interceptor
 
       axios.interceptors.response.use(function (response) {
-        // Any status code that lie within the range of 2xx cause this function to trigger
-        // Do something with response data
-        _this4.loading = false;
+        _this5.loading = false;
         return response;
       }, function (error) {
-        // Any status codes that falls outside the range of 2xx cause this function to trigger
-        // Do something with response error
-        _this4.loading = false;
+        _this5.loading = false;
         return Promise.reject(error);
       });
     },
@@ -2495,62 +2545,61 @@ __webpack_require__.r(__webpack_exports__);
       this.dialog = true;
     },
     deleteItem: function deleteItem(item) {
-      var _this5 = this;
+      var _this6 = this;
 
       var index = this.roles.data.indexOf(item);
-      var decide = confirm("Are you sure you want to delete this item?");
+      var decide = confirm('Are you sure you want to delete this item?');
 
       if (decide) {
         axios["delete"]('/api/roles/' + item.id).then(function (res) {
-          _this5.snackbarText = "Record Delete Successfully!";
-          _this5.snackbar = true;
+          _this6.text = "Record Deleted Successfully!";
+          _this6.snackbar = true;
 
-          _this5.roles.data.splice(index, 1);
+          _this6.roles.data.splice(index, 1);
         })["catch"](function (err) {
           console.log(err.response);
-          _this5.snackbarText = "Error Deleting Record!";
-          _this5.snackbar = true;
+          _this6.text = "Error Deleting Record";
+          _this6.snackbar = true;
         });
       }
     },
     close: function close() {
-      var _this6 = this;
+      var _this7 = this;
 
       this.dialog = false;
       setTimeout(function () {
-        _this6.editedItem = Object.assign({}, _this6.defaultItem);
-        _this6.editedIndex = -1;
+        _this7.editedItem = Object.assign({}, _this7.defaultItem);
+        _this7.editedIndex = -1;
       }, 300);
     },
     save: function save() {
-      var _this7 = this;
-
-      var index = this.editedIndex;
+      var _this8 = this;
 
       if (this.editedIndex > -1) {
+        var index = this.editedIndex;
         axios.put('/api/roles/' + this.editedItem.id, {
           'name': this.editedItem.name
         }).then(function (res) {
-          _this7.snackbarText = "Record Updated Successfully!";
-          _this7.snackbar = true;
-          Object.assign(_this7.roles.data[index], _this7.editedItem);
+          _this8.text = "Record Updated Successfully!";
+          _this8.snackbar = true;
+          Object.assign(_this8.roles.data[index], res.data.role);
         })["catch"](function (err) {
           console.log(err.response);
-          _this7.snackbarText = "Error Updating Record!";
-          _this7.snackbar = true;
-        });
+          _this8.text = "Error Updating Record";
+          _this8.snackbar = true;
+        }); // Object.assign(this.roles[this.editedIndex], this.editedItem)
       } else {
         axios.post('/api/roles', {
           'name': this.editedItem.name
         }).then(function (res) {
-          _this7.snackbarText = "Record Added Successfully!";
-          _this7.snackbar = true;
+          _this8.text = "Record Added Successfully!";
+          _this8.snackbar = true;
 
-          _this7.roles.data.push(res.data.role);
+          _this8.roles.data.push(res.data.role);
         })["catch"](function (err) {
-          console.log(err.response);
-          _this7.snackbarText = "Error Inserting Record!";
-          _this7.snackbar = true;
+          console.dir(err.response);
+          _this8.text = "Error Inserting Record";
+          _this8.snackbar = true;
         });
       }
 
@@ -3124,7 +3173,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     search_it: function search_it(e) {
       var _this5 = this;
 
-      if (e.length >= 3) {
+      if (e.length > 3) {
         axios.get("/api/users/".concat(e)).then(function (res) {
           _this5.users = res.data.users;
         })["catch"](function (err) {
@@ -22018,21 +22067,27 @@ var render = function() {
         staticClass: "elevation-1",
         attrs: {
           "item-key": "name",
+          color: "error",
           loading: _vm.loading,
           "loading-text": "Loading... Please wait",
           headers: _vm.headers,
+          options: _vm.options,
           "server-items-length": _vm.roles.total,
           items: _vm.roles.data,
-          "items-per-page": 5,
           "show-select": "",
           "footer-props": {
             itemsPerPageOptions: [5, 10, 15],
             itemsPerPageText: "Roles Per Page",
-            showCurrentPage: true,
-            showFirstLastPage: true
+            "show-current-page": true,
+            "show-first-last-page": true
           }
         },
-        on: { pagination: _vm.paginate, input: _vm.selectAll },
+        on: {
+          "update:options": function($event) {
+            _vm.options = $event
+          },
+          input: _vm.selectAll
+        },
         scopedSlots: _vm._u([
           {
             key: "top",
@@ -22066,10 +22121,7 @@ var render = function() {
                                   _vm._g(
                                     {
                                       staticClass: "mb-2",
-                                      attrs: {
-                                        color: "error darken-1",
-                                        dark: ""
-                                      }
+                                      attrs: { color: "error", dark: "" }
                                     },
                                     on
                                   ),
@@ -22080,10 +22132,7 @@ var render = function() {
                                   "v-btn",
                                   {
                                     staticClass: "mb-2 mr-2",
-                                    attrs: {
-                                      color: "error darken-1",
-                                      dark: ""
-                                    },
+                                    attrs: { color: "error", dark: "" },
                                     on: { click: _vm.deleteAll }
                                   },
                                   [_vm._v("Delete")]
@@ -22126,6 +22175,7 @@ var render = function() {
                                           [
                                             _c("v-text-field", {
                                               attrs: {
+                                                autofocus: "",
                                                 color: "error",
                                                 label: "Role Name"
                                               },
@@ -22143,7 +22193,11 @@ var render = function() {
                                             })
                                           ],
                                           1
-                                        )
+                                        ),
+                                        _vm._v(" "),
+                                        _c("v-col", {
+                                          attrs: { cols: "12", sm: "12" }
+                                        })
                                       ],
                                       1
                                     )
@@ -22162,7 +22216,10 @@ var render = function() {
                                 _c(
                                   "v-btn",
                                   {
-                                    attrs: { color: "error", text: "" },
+                                    attrs: {
+                                      color: "error darken-1",
+                                      text: ""
+                                    },
                                     on: { click: _vm.close }
                                   },
                                   [_vm._v("Cancel")]
@@ -22171,7 +22228,10 @@ var render = function() {
                                 _c(
                                   "v-btn",
                                   {
-                                    attrs: { color: "error", text: "" },
+                                    attrs: {
+                                      color: "error darken-1",
+                                      text: ""
+                                    },
                                     on: { click: _vm.save }
                                   },
                                   [_vm._v("Save")]
@@ -22199,11 +22259,11 @@ var render = function() {
                         _c("v-text-field", {
                           staticClass: "mx-4",
                           attrs: {
+                            label: "Search...",
                             color: "error",
-                            "append-icon": "mdi-magnify",
-                            label: "Search....."
+                            "append-icon": "mdi-magnify"
                           },
-                          on: { input: _vm.search_it }
+                          on: { input: _vm.searchIt }
                         })
                       ],
                       1
@@ -22216,7 +22276,7 @@ var render = function() {
             proxy: true
           },
           {
-            key: "item.actions",
+            key: "item.action",
             fn: function(ref) {
               var item = ref.item
               return [
@@ -22231,7 +22291,7 @@ var render = function() {
                       }
                     }
                   },
-                  [_vm._v("mdi-pencil")]
+                  [_vm._v("\n        mdi-content-save-edit-outline\n      ")]
                 ),
                 _vm._v(" "),
                 _c(
@@ -22244,7 +22304,7 @@ var render = function() {
                       }
                     }
                   },
-                  [_vm._v("mdi-delete")]
+                  [_vm._v("\n        mdi-delete\n      ")]
                 )
               ]
             }
@@ -22277,9 +22337,7 @@ var render = function() {
           }
         },
         [
-          _vm._v(
-            "\n             " + _vm._s(_vm.snackbarText) + "\n             "
-          ),
+          _vm._v("\n               " + _vm._s(_vm.text) + "\n                "),
           _c(
             "v-btn",
             {
@@ -22290,7 +22348,7 @@ var render = function() {
                 }
               }
             },
-            [_vm._v("Close")]
+            [_vm._v("\n                  Close\n                ")]
           )
         ],
         1
@@ -80550,8 +80608,8 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuetify__WEBPACK_IMPORTED_MODULE_
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! E:\laragon\www\laravue\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! E:\laragon\www\laravue\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! E:\laragon\www\AdminAppwithLaravelVue\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! E:\laragon\www\AdminAppwithLaravelVue\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

@@ -184,10 +184,11 @@ class UserController extends Controller
         $user = User::find($request->user);
         $profile = Profile::where('user_id', $request->user)->first();
         $ext = $request->photo->extension();
-        $photo = $request->photo->storeAs('images', Str::random(20).".{$ext}",'public');
-        $profile->photo =$photo;
+        $photoName= Str::random(20).".{$ext}";
+        $photo = $request->photo->storeAs('images',$photoName,'public');
+        $profile->photo = $photoName;
         $user->profile()->save($profile);
-        return response()->json(['user'=> new UserResource($user)] , 200);
+        return response()->json(['user' => new UserResource($user)], 200);
     }
 
     public function verifyEmail(Request $request)
@@ -207,7 +208,7 @@ class UserController extends Controller
         $user->password = bcrypt($request->password);
         $user->api_token = Hash::make($request->password);
        // $token = Str::random(80);
-        $user->role_id = "0";
+        $user->role_id = "1";
         $user->save();
         $user->profile()->save(new Profile());
 
